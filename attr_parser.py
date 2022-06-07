@@ -6,6 +6,7 @@ from random import randint
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from xvfbwrapper import Xvfb
 
 
 # from selenium.webdriver.chrome.options import Options
@@ -212,26 +213,28 @@ class sudrf_parser:
 
     def single_parse_responce(self, court='pskov'):
 
-        browser = webdriver.Firefox()
-        # options = Options()
-        # options.headless = True
-        # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
+        with Xvfb() as xvfb:
+            browser = webdriver.Firefox()
+            # options = Options()
+            # options.headless = True
+            # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
 
-        url_address = self.generate_url(court)
-        browser.get(url_address)
+            url_address = self.generate_url(court)
+            browser.get(url_address)
 
-        # if it is not error window
-        try:
-            assert f'{self.title_dict.get(court)}' in browser.title
-        except AssertionError as e:
-            self.logger_attr_parser.exception(f"Can not get page from address {url_address}. "
-                                              f"Page title is {browser.title}")
-            raise e
-        else:
-            page = (browser.page_source).encode('cp1251')
-        finally:
-            sleep(randint(5, 20))
-            browser.close()
+            # if it is not error window
+            try:
+                assert f'{self.title_dict.get(court)}' in browser.title
+            except AssertionError as e:
+                self.logger_attr_parser.exception(f"Can not get page from address {url_address}. "
+                                                  f"Page title is {browser.title} \n"
+                                                  f"Page: {browser.page_source}")
+                raise e
+            else:
+                page = (browser.page_source).encode('cp1251')
+            finally:
+                sleep(randint(5, 20))
+                browser.close()
 
         soup = BeautifulSoup(page, from_encoding='cp1251', features='lxml')
 
@@ -275,6 +278,50 @@ class sudrf_parser:
         assert isinstance(day_for, str)
         self.attrs['adm_case__ENTRY_DATE2D'] = day_for
 
+    def single_parse_test(self):
+
+        with Xvfb() as xvfb:
+            browser = webdriver.Firefox()
+            # options = Options()
+            # options.headless = True
+            # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
+
+            # url_address = "https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb"
+            url_address = "https://nevelsky--psk.sudrf.ru/modules.php?name=sud_delo&" \
+                          "srv_num=1&name_op=r&delo_id=1500001&case_type=0&new=0&adm_parts__NAMESS=&" \
+                          "adm_case__CASE_NUMBERSS=&adm_case__JUDICIAL_UIDSS=&" \
+                          "delo_table=adm_case&adm_case__ENTRY_DATE1D=01.01.2022&" \
+                          "adm_case__ENTRY_DATE2D=07.06.2022&adm_case__PR_NUMBERSS=&" \
+                          "ADM_CASE__JUDGE=&adm_case__RESULT_DATE1D=&adm_case__RESULT_DATE2D=&" \
+                          "ADM_CASE__RESULT=&ADM_CASE__BUILDING_ID=&ADM_CASE__COURT_STRUCT=&" \
+                          "ADM_EVENT__EVENT_NAME=&adm_event__EVENT_DATEDD=&ADM_PARTS__PARTS_TYPE=&" \
+                          "adm_parts__LAW_ARTICLESS=&lawbookarticles%5B%5D=12.6&adm_parts__INN_STRSS=&" \
+                          "adm_parts__KPP_STRSS=&adm_parts__OGRN_STRSS=&adm_parts__OGRNIP_STRSS=&" \
+                          "adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D=&" \
+                          "ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D=&" \
+                          "adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8#"
+            browser.get(url_address)
+
+            # if it is not error window
+            try:
+                # assert f'python - How do I run Selenium in Xvfb?' in browser.title
+                assert 'Невельский районный суд Псковской области' in browser.title
+            except AssertionError as e:
+                self.logger_attr_parser.exception(f"TEST FUNCTION Can not get page from address {url_address}. "
+                                                  f"Page title is {browser.title} \n"
+                                                  f"Page: {browser.page_source}")
+                raise e
+            else:
+                # page = browser.page_source
+                page = browser.page_source.encode('cp1251')
+            finally:
+                print("sleeping...")
+                sleep(randint(5, 20))
+                browser.close()
+
+        print(page)
+
 
 if __name__ == '__main__':
     instance = sudrf_parser()
+    instance.single_parse_test()
