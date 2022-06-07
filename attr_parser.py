@@ -286,8 +286,8 @@ class sudrf_parser:
         # options.headless = True
         # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
 
-        url_address = "https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb"
-        """
+        # url_address = "https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb"
+
         url_address = "https://nevelsky--psk.sudrf.ru/modules.php?name=sud_delo&" \
                       "srv_num=1&name_op=r&delo_id=1500001&case_type=0&new=0&adm_parts__NAMESS=&" \
                       "adm_case__CASE_NUMBERSS=&adm_case__JUDICIAL_UIDSS=&" \
@@ -301,21 +301,21 @@ class sudrf_parser:
                       "adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D=&" \
                       "ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D=&" \
                       "adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8#"
-        """
+
         browser.get(url_address)
 
         # if it is not error window
         try:
-            assert f'python - How do I run Selenium in Xvfb?' in browser.title
-            # assert 'Невельский районный суд Псковской области' in browser.title
+            # assert f'python - How do I run Selenium in Xvfb?' in browser.title
+            assert 'Невельский районный суд Псковской области' in browser.title
         except AssertionError as e:
             self.logger_attr_parser.exception(f"TEST FUNCTION Can not get page from address {url_address}. "
                                               f"Page title is {browser.title} \n"
                                               f"Page: {browser.page_source}")
             raise e
         else:
-            page = browser.page_source
-            # page = browser.page_source.encode('cp1251')
+            # page = browser.page_source
+            page = browser.page_source.encode('cp1251')
         finally:
             print("sleeping...")
             sleep(randint(5, 20))
