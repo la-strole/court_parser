@@ -5,6 +5,7 @@ import time
 selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
 print("Test Execution Started")
 time.sleep(10)
+# https://selenium-python.readthedocs.io/api.html
 driver = webdriver.Remote(options=webdriver.FirefoxOptions(),
                           command_executor=selenium_grid_url)
 
