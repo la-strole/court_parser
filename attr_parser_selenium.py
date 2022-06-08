@@ -280,8 +280,10 @@ class sudrf_parser:
 
     def single_parse_test(self):
 
+
         index = 1
 
+        print(f"Start single parse test. index is {index}")
         # browser = webdriver.Firefox()
         options = webdriver.FirefoxOptions()
         selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
@@ -303,10 +305,10 @@ class sudrf_parser:
                        "=&ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D"
                        "=&adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8# "
                        ]
-
+        print(f'Try to get url {url_address[index]}')
         browser.get(url_address[index])
 
-        # if it is not error window
+        print('Looking for error window')
         try:
             if index == 0:
                 assert f'python - How do I run Selenium in Xvfb?' in browser.title
