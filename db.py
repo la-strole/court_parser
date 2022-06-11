@@ -16,7 +16,12 @@ class data_base:
         self.logger_db.addHandler(f_handler)
 
         # create db if it is not exist
-        self.db_name = 'court.db'
+        db_path = os.environ.get('db_path')
+        if db_path:
+            self.db_name = f'{db_path}/court.db'
+        else:
+            self.logger_db.error("Can not find environment variable db_path.")
+            self.db_name = f'court.db'
         if not os.path.isfile(f'{self.db_name}'):
             self.create_db()
 

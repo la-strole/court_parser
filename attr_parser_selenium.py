@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import logging
 from collections import OrderedDict
 from time import sleep
@@ -13,7 +13,7 @@ from selenium import webdriver
 class sudrf_parser:
 
     def __init__(self, date_from='01.01.2022',
-                 date_for='.'.join(datetime.date.today().isoformat().split('-')[::-1])):
+                 date_for=f'{datetime.today().day:02d}.{datetime.today().month:02d}.{datetime.today().year}'):
 
         self.title_dict = {'pechorsky': 'Печорский районный суд Псковской области',
                            'pskov': 'Псковский городской суд Псковской области',
@@ -210,7 +210,7 @@ class sudrf_parser:
 
         return ''.join((court_address, attr_address[1:]))
 
-    def single_parse(self, court='nevelsky'):
+    def single_parse(self, court='pechorsky'):
         """ Parse single page.
 
         """
@@ -331,7 +331,6 @@ class sudrf_parser:
         print("success!")
         """
 
-
     def all_parse_response(self):
 
         result = dict()
@@ -340,17 +339,7 @@ class sudrf_parser:
 
         return result
 
-    def set_day_from(self, day_from):
-        assert isinstance(day_from, str)
-        self.attrs['adm_case__ENTRY_DATE1D'] = day_from
-
-    def set_day_for(self, day_for):
-        assert isinstance(day_for, str)
-        self.attrs['adm_case__ENTRY_DATE2D'] = day_for
-
 
 if __name__ == '__main__':
     instance = sudrf_parser()
     instance.single_parse()
-
-
