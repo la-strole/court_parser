@@ -6,11 +6,9 @@ from random import randint
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from xvfbwrapper import Xvfb
 
 
 # from selenium.webdriver.chrome.options import Options
-
 
 class sudrf_parser:
 
@@ -38,6 +36,7 @@ class sudrf_parser:
                            'sebezhsky': 'Себежский районный суд Псковской области',
                            'strugokrasnensky': 'Стругокрасненский районный суд Псковской области'}
 
+        # Add logger
         self.logger_attr_parser = logging.getLogger('attr_parser.py')
         f_handler = logging.FileHandler('file.log')
         f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -211,31 +210,56 @@ class sudrf_parser:
 
         return ''.join((court_address, attr_address[1:]))
 
-    def single_parse_responce(self, court='pskov'):
+    def single_parse(self, court='pskov'):
+        """ Parse single page.
 
-        with Xvfb() as xvfb:
-            browser = webdriver.Firefox()
-            # options = Options()
-            # options.headless = True
-            # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
+        """
+        # for stackoverflow test parsing
+        index = 0
 
-            url_address = self.generate_url(court)
-            browser.get(url_address)
+        print(f"Start single parse test. index is {index}")
 
-            # if it is not error window
-            try:
-                assert f'{self.title_dict.get(court)}' in browser.title
-            except AssertionError as e:
-                self.logger_attr_parser.exception(f"Can not get page from address {url_address}. "
-                                                  f"Page title is {browser.title} \n"
-                                                  f"Page: {browser.page_source}")
-                raise e
-            else:
-                page = (browser.page_source).encode('cp1251')
-            finally:
-                sleep(randint(5, 20))
-                browser.close()
+        options = webdriver.FirefoxOptions()
+        selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
+        browser = webdriver.Remote(command_executor=selenium_grid_url,
+                                   options=options)
 
+        # url_address = self.generate_url(court)
+        url_address = ["https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb",
+                       "http://nevelsky--psk.sudrf.ru/modules.php?name=sud_delo&srv_num=1&name_op=r&delo_id"
+                       "=1500001&case_type=0&new=0&adm_parts__NAMESS=&adm_case__CASE_NUMBERSS"
+                       "=&adm_case__JUDICIAL_UIDSS=&delo_table=adm_case&adm_case__ENTRY_DATE1D=01.01.2022"
+                       "&adm_case__ENTRY_DATE2D=07.06.2022&adm_case__PR_NUMBERSS=&ADM_CASE__JUDGE"
+                       "=&adm_case__RESULT_DATE1D=&adm_case__RESULT_DATE2D=&ADM_CASE__RESULT=&ADM_CASE__BUILDING_ID"
+                       "=&ADM_CASE__COURT_STRUCT=&ADM_EVENT__EVENT_NAME=&adm_event__EVENT_DATEDD"
+                       "=&ADM_PARTS__PARTS_TYPE=&adm_parts__LAW_ARTICLESS=&lawbookarticles%5B%5D=12.6"
+                       "&adm_parts__INN_STRSS=&adm_parts__KPP_STRSS=&adm_parts__OGRN_STRSS=&adm_parts__OGRNIP_STRSS"
+                       "=&adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D"
+                       "=&ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D"
+                       "=&adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8# "
+                       ]
+
+        print(f'Try to get url {url_address[index]}')
+
+        browser.get(url_address[index])
+
+        """
+        # if it is not error window
+        try:
+            assert f'{self.title_dict.get(court)}' in browser.title
+        except AssertionError as e:
+            browser.get_screenshot_as_file('./screenshots/fail.png')
+            self.logger_attr_parser.exception(f"Can not get page from address {url_address}. "
+                                              f"Page title is {browser.title} \n"
+                                              f"Page: {browser.page_source}. {e}")
+            return None
+        else:
+            browser.get_screenshot_as_file('./screenshots/success.png')
+            page = (browser.page_source).encode('cp1251')
+        finally:
+            sleep(randint(5, 20))
+            browser.quit()
+            
         soup = BeautifulSoup(page, from_encoding='cp1251', features='lxml')
 
         # If no data exist at this page
@@ -248,8 +272,8 @@ class sudrf_parser:
             try:
                 assert table
             except AssertionError as e:
-                self.logger_attr_parser.exception(f"Can not parse page {browser.title} with bs4.")
-                raise e
+                self.logger_attr_parser.exception(f"Can not parse page {browser.title} with bs4. {e}")
+                return None
 
             table_body = table.find("tbody")
             rows = list()
@@ -261,52 +285,7 @@ class sudrf_parser:
 
             # rows.extend([table_headers])
             return rows
-
-    def all_parse_response(self):
-
-        result = dict()
-        for court in self.url_court:
-            result[court] = self.single_parse_responce(court)
-
-        return result
-
-    def set_day_from(self, day_from):
-        assert isinstance(day_from, str)
-        self.attrs['adm_case__ENTRY_DATE1D'] = day_from
-
-    def set_day_for(self, day_for):
-        assert isinstance(day_for, str)
-        self.attrs['adm_case__ENTRY_DATE2D'] = day_for
-
-    def single_parse_test(self):
-
-
-        index = 1
-
-        print(f"Start single parse test. index is {index}")
-        # browser = webdriver.Firefox()
-        options = webdriver.FirefoxOptions()
-        selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
-        browser = webdriver.Remote(command_executor=selenium_grid_url,
-                                   options=options)
-        # options.headless = True
-        # browser = webdriver.Chrome("/usr/bin/chromedriver", options=options)
-
-        url_address = ["https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb",
-                       "https://nevelsky--psk.sudrf.ru/modules.php?name=sud_delo&srv_num=1&name_op=r&delo_id"
-                       "=1500001&case_type=0&new=0&adm_parts__NAMESS=&adm_case__CASE_NUMBERSS"
-                       "=&adm_case__JUDICIAL_UIDSS=&delo_table=adm_case&adm_case__ENTRY_DATE1D=01.01.2022"
-                       "&adm_case__ENTRY_DATE2D=07.06.2022&adm_case__PR_NUMBERSS=&ADM_CASE__JUDGE"
-                       "=&adm_case__RESULT_DATE1D=&adm_case__RESULT_DATE2D=&ADM_CASE__RESULT=&ADM_CASE__BUILDING_ID"
-                       "=&ADM_CASE__COURT_STRUCT=&ADM_EVENT__EVENT_NAME=&adm_event__EVENT_DATEDD"
-                       "=&ADM_PARTS__PARTS_TYPE=&adm_parts__LAW_ARTICLESS=&lawbookarticles%5B%5D=12.6"
-                       "&adm_parts__INN_STRSS=&adm_parts__KPP_STRSS=&adm_parts__OGRN_STRSS=&adm_parts__OGRNIP_STRSS"
-                       "=&adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D"
-                       "=&ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D"
-                       "=&adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8# "
-                       ]
-        print(f'Try to get url {url_address[index]}')
-        browser.get(url_address[index])
+        """
 
         print('Looking for error window')
         try:
@@ -318,8 +297,9 @@ class sudrf_parser:
             browser.get_screenshot_as_file('./screenshots/fail.png')
             self.logger_attr_parser.exception(f"TEST FUNCTION Can not get page from address {url_address}. "
                                               f"Page title is {browser.title} \n"
-                                              f"Page: {browser.page_source}")
-            raise e
+                                              f"Page: {browser.page_source}. {e}")
+            return None
+
         else:
             browser.get_screenshot_as_file('./screenshots/success.png')
             if index == 0:
@@ -331,9 +311,29 @@ class sudrf_parser:
             sleep(randint(5, 20))
             browser.quit()
 
-        print(page)
+        print("success!")
+
+
+
+    def all_parse_response(self):
+
+        result = dict()
+        for court in self.url_court:
+            result[court] = self.single_parse(court)
+
+        return result
+
+    def set_day_from(self, day_from):
+        assert isinstance(day_from, str)
+        self.attrs['adm_case__ENTRY_DATE1D'] = day_from
+
+    def set_day_for(self, day_for):
+        assert isinstance(day_for, str)
+        self.attrs['adm_case__ENTRY_DATE2D'] = day_for
 
 
 if __name__ == '__main__':
     instance = sudrf_parser()
-    instance.single_parse_test()
+    instance.single_parse()
+
+

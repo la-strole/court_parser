@@ -16,25 +16,25 @@ class data_base:
         self.logger_db.addHandler(f_handler)
 
         # create db if it is not exist
-        if not os.path.isfile('court.db'):
-            self.db_connection = self.create_db()
-        else:
-            self.db_connection = sqlite3.connect('court.db')
-            self.db_connection.row_factory = sqlite3.Row
+        self.db_name = 'court.db'
+        if not os.path.isfile(f'{self.db_name}'):
+            self.create_db()
 
     def create_db(self):
         """ Create database at ./court.db
+
         """
-        if os.path.isfile('court.db'):
+        if os.path.isfile(f'{self.db_name}'):
             self.logger_db.error(f"Can not create new database. File with db court.db already exist.")
             raise RuntimeError(f"file with db court.db already exist")
         else:
             with open('schema.sql') as fp:
-                con = sqlite3.connect('court.db')
-                con.executescript(fp.read())
-                con.commit()
-                con.row_factory = sqlite3.Row
-            return con
+                with sqlite3.connect(f'{self.db_name}') as con:
+                    try:
+                        con.executescript(fp.read())
+                        con.commit()
+                    except Error as e:
+                        self.logger_db.error(f'{e}')
 
     def write_to_database(self, result):
         """ Write to database table courts data from result
@@ -56,28 +56,26 @@ class data_base:
                     judicial_act = row[7]
                     date_update = datetime.today().isoformat()
 
-                    try:
-                        self.db_connection.execute(
-                            "insert into courts(court_name, id, full_name, article, judge_full_name, "
-                            "date_adoption, decision_date, effective_date, judicial_act, date_update) "
-                            "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (court_name,
-                                                                      id,
-                                                                      full_name.strip(),
-                                                                      article.strip(),
-                                                                      judge_full_name,
-                                                                      date_adoption,
-                                                                      descision_date,
-                                                                      effective_date,
-                                                                      judicial_act,
-                                                                      date_update))
-                    except Error:
-                        self.logger_db.exception(f"Error inserting data for {court_name}")
-                        continue
+                    with sqlite3.connect(f'{self.db_name}') as con:
+                        con.row_factory = sqlite3.Row
+                        try:
+                            con.execute(
+                                "insert into courts(court_name, id, full_name, article, judge_full_name, "
+                                "date_adoption, decision_date, effective_date, judicial_act, date_update) "
+                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (court_name,
+                                                                          id,
+                                                                          full_name.strip(),
+                                                                          article.strip(),
+                                                                          judge_full_name,
+                                                                          date_adoption,
+                                                                          descision_date,
+                                                                          effective_date,
+                                                                          judicial_act,
+                                                                          date_update))
+                            con.commit()
+                        except Error as e:
+                            self.logger_db.exception(f"Error inserting data for {court_name}. {e}")
+
             else:
                 continue
-        self.db_connection.commit()
-
-    def close_db_connection(self):
-        self.db_connection.close()
-
 
