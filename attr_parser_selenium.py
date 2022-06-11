@@ -250,9 +250,9 @@ class sudrf_parser:
                        ]
         """
 
-        print(f'Try to get url {url_address[index]}')
+        print(f'Try to get url {url_address}')
 
-        browser.get(url_address[index])
+        browser.get(url_address)
 
         print(f"Try to scan if court name {court} in browser title")
 
