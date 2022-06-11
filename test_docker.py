@@ -19,5 +19,5 @@ time.sleep(10)
 print(driver.title)
 time.sleep(10)
 # close the browser
-driver.close()
+driver.quit()
 print("Test Execution Successfully Completed!")
