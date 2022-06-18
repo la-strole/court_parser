@@ -215,7 +215,15 @@ class sudrf_parser:
 
         """
 
-        proxy = "87.248.229.222:80"
+        PROXY = "87.248.229.222:80"
+
+        webdriver.DesiredCapabilities.FIREFOX['proxy'] = {
+            "httpProxy": PROXY,
+            "ftpProxy": PROXY,
+            "sslProxy": PROXY,
+            "proxyType": "MANUAL",
+
+        }
 
         # for stackoverflow test parsing
         index = 2
@@ -223,8 +231,7 @@ class sudrf_parser:
         print(f"Start single parse test. index is {index}")
 
         options = webdriver.FirefoxOptions()
-        if proxy:
-            options.add_argument(f"--proxy-server={proxy}")
+
         selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
         browser = webdriver.Remote(command_executor=selenium_grid_url,
                                    options=options)
