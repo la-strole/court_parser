@@ -5,7 +5,7 @@ from selenium import webdriver
 
 
 class TestGetPage(unittest.TestCase):
-    def test_get_page(self):
+    def test_get_page_proxy(self):
         # https://free-proxy-list.net/
 
         proxy = '45.149.43.56:53281'
@@ -37,6 +37,30 @@ class TestGetPage(unittest.TestCase):
 
             # Stop browser
             sleep(5)
+            browser.close()
+
+        self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
+
+    def test_get_page(self):
+        url = "http://porhovsky.psk.sudrf.ru"
+        title = "Порховский районный суд Псковской области"
+
+        # Set selenium configuration (run at docker container)
+        options = webdriver.FirefoxOptions()
+
+        selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
+
+        with webdriver.Remote(command_executor=selenium_grid_url,
+                              options=options) as browser:
+            browser.set_page_load_timeout(300)
+
+            # Get page
+            browser.get(url)
+            test_title = browser.title
+
+            # Stop browser
+            sleep(5)
+            browser.close()
 
         self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
 
