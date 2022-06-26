@@ -75,8 +75,8 @@ class sudrf_parser:
                                   ('adm_case__CASE_NUMBERSS', ''),
                                   ('adm_case__JUDICIAL_UIDSS', ''),
                                   ('delo_table', 'adm_case'),
-                                  ('adm_case__ENTRY_DATE1D', date_from),  # Искать с числа
-                                  ('adm_case__ENTRY_DATE2D', date_for),  # Искать по число
+                                  ('adm_case__ENTRY_DATE1D', date_from),  # Search from
+                                  ('adm_case__ENTRY_DATE2D', date_for),  # Search at
                                   ('adm_case__PR_NUMBERSS', ''),
                                   ('ADM_CASE__JUDGE', ''),
                                   ('adm_case__RESULT_DATE1D', ''),
@@ -210,11 +210,12 @@ class sudrf_parser:
 
         return ''.join((court_address, attr_address[1:]))
 
-    def single_parse(self, court='pechorsky'):
-        """ Parse single page.
+    def get_page_single_parse(self, court='pechorsky'):
+        """ Get single page.
 
         """
 
+        """
         PROXY = "87.248.229.222:80"
 
         webdriver.DesiredCapabilities.FIREFOX['proxy'] = {
@@ -224,11 +225,7 @@ class sudrf_parser:
             "proxyType": "MANUAL",
 
         }
-
-        # for stackoverflow test parsing
-        index = 2
-
-        print(f"Start single parse test. index is {index}")
+        """
 
         options = webdriver.FirefoxOptions()
 
@@ -237,56 +234,34 @@ class sudrf_parser:
                                    options=options)
 
         url_address = self.generate_url(court)
-        """
-        url_address = ["https://stackoverflow.com/questions/6183276/how-do-i-run-selenium-in-xvfb",
-                       "http://nevelsky--psk.sudrf.ru/modules.php?name=sud_delo&srv_num=1&name_op=r&delo_id"
-                       "=1500001&case_type=0&new=0&adm_parts__NAMESS=&adm_case__CASE_NUMBERSS"
-                       "=&adm_case__JUDICIAL_UIDSS=&delo_table=adm_case&adm_case__ENTRY_DATE1D=01.01.2022"
-                       "&adm_case__ENTRY_DATE2D=07.06.2022&adm_case__PR_NUMBERSS=&ADM_CASE__JUDGE"
-                       "=&adm_case__RESULT_DATE1D=&adm_case__RESULT_DATE2D=&ADM_CASE__RESULT=&ADM_CASE__BUILDING_ID"
-                       "=&ADM_CASE__COURT_STRUCT=&ADM_EVENT__EVENT_NAME=&adm_event__EVENT_DATEDD"
-                       "=&ADM_PARTS__PARTS_TYPE=&adm_parts__LAW_ARTICLESS=&lawbookarticles%5B%5D=12.6"
-                       "&adm_parts__INN_STRSS=&adm_parts__KPP_STRSS=&adm_parts__OGRN_STRSS=&adm_parts__OGRNIP_STRSS"
-                       "=&adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D"
-                       "=&ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D"
-                       "=&adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&Submit=%CD%E0%E9%F2%E8# ",
-                       "http://nevelsky.psk.sudrf.ru/modules.php?name=sud_delo&srv_num=1&name_op=r&delo_id"
-                       "=1500001&case_type=0&new=0&adm_parts__NAMESS=&adm_case__CASE_NUMBERSS"
-                       "=&adm_case__JUDICIAL_UIDSS=&delo_table=adm_case&adm_case__ENTRY_DATE1D=01.01.2022"
-                       "&adm_case__ENTRY_DATE2D=11.06.2022&adm_case__PR_NUMBERSS=&ADM_CASE__JUDGE"
-                       "=&adm_case__RESULT_DATE1D=&adm_case__RESULT_DATE2D=&ADM_CASE__RESULT="
-                       "%25C2%25FB%25ED%25E5%25F1%25E5%25ED%25EE%2520%25EF%25EE%25F1%25F2%25E0%25ED%25EE%25E2%25EB"
-                       "%25E5%25ED%25E8%25E5%2520%25EE%2520%25ED%25E0%25E7%25ED%25E0%25F7%25E5%25ED%25E8%25E8%2520"
-                       "%25E0%25E4%25EC%25E8%25ED%25E8%25F1%25F2%25F0%25E0%25F2%25E8%25E2%25ED%25EE%25E3%25EE%2520"
-                       "%25ED%25E0%25EA%25E0%25E7%25E0%25ED%25E8%25FF&ADM_CASE__BUILDING_ID=&ADM_CASE__COURT_STRUCT=&ADM_EVENT__EVENT_NAME=&adm_event__EVENT_DATEDD=&ADM_PARTS__PARTS_TYPE=&adm_parts__LAW_ARTICLESS=&lawbookarticles%5B%5D=20.2+%F7.1&lawbookarticles%5B%5D=20.2+%F7.2&lawbookarticles%5B%5D=20.2+%F7.3&lawbookarticles%5B%5D=20.2+%F7.4&lawbookarticles%5B%5D=20.2+%F7.5&lawbookarticles%5B%5D=20.2+%F7.6&lawbookarticles%5B%5D=20.2+%F7.7&lawbookarticles%5B%5D=20.2+%F7.8&lawbookarticles%5B%5D=20.2+%F7.10&lawbookarticles%5B%5D=20.3.2+%F7.1&lawbookarticles%5B%5D=20.3.2+%F7.2&lawbookarticles%5B%5D=20.3.3+%F7.1&lawbookarticles%5B%5D=20.3.3+%F7.2&lawbookarticles%5B%5D=20.3.4&adm_parts__INN_STRSS=&adm_parts__KPP_STRSS=&adm_parts__OGRN_STRSS=&adm_parts__OGRNIP_STRSS=&adm_document__PUBL_DATE1D=&adm_document__PUBL_DATE2D=&ADM_CASE__VALIDITY_DATE1D=&ADM_CASE__VALIDITY_DATE2D=&adm_order_info__ORDER_DATE1D=&adm_order_info__ORDER_DATE2D=&adm_order_info__ORDER_NUMSS=&ADM_ORDER_INFO__STATE_ID=&list=ON&Submit=%CD%E0%E9%F2%E8#"
-                       ]
-        """
 
-        print(f'Try to get url {url_address}')
+        print(f'Try to get page for {court}')
 
         browser.get(url_address)
 
         print(f"Try to scan if court name {court} in browser title")
 
-        # If it is not error window
+        # If it not error window
         try:
             assert f'{self.title_dict.get(court)}' in browser.title
         except AssertionError as e:
-            print(f"Error. Court name not in browser title: {browser.title}")
+            # print(f"Error. Court name not in browser title: {browser.title}")
             browser.get_screenshot_as_file('./screenshots/fail.png')
             self.logger_attr_parser.exception(f"Can not get page from address {url_address}. "
                                               f"Page title is {browser.title} \n"
                                               f"Page: {browser.page_source}. {e}")
             return None
         else:
-            print("Success! Court name in browser title!")
+            # print("Success! Court name in browser title!")
             browser.get_screenshot_as_file('./screenshots/success.png')
             page = (browser.page_source).encode('cp1251')
+            return page
         finally:
             sleep(randint(5, 20))
             browser.quit()
 
-        print("Try to prepare soup from page.")
+    def parce_single_page(self, page):
+        # print("Try to prepare soup from page.")
         soup = BeautifulSoup(page, from_encoding='cp1251', features='lxml')
 
         # If no data exist at this page
@@ -314,44 +289,16 @@ class sudrf_parser:
             # rows.extend([table_headers])
             print("Success! return data.")
             return rows
-        """
-
-        print('Looking for error window')
-        try:
-            if index == 0:
-                assert f'python - How do I run Selenium in Xvfb?' in browser.title
-            else:
-                assert 'Невельский районный суд Псковской области' in browser.title
-        except AssertionError as e:
-            browser.get_screenshot_as_file('./screenshots/fail.png')
-            self.logger_attr_parser.exception(f"TEST FUNCTION Can not get page from address {url_address}. "
-                                              f"Page title is {browser.title} \n"
-                                              f"Page: {browser.page_source}. {e}")
-            return None
-
-        else:
-            browser.get_screenshot_as_file('./screenshots/success.png')
-            if index == 0:
-                page = browser.page_source
-            else:
-                page = browser.page_source.encode('cp1251')
-        finally:
-            print("sleeping...")
-            sleep(randint(5, 20))
-            browser.quit()
-      
-        print("success!")
-        """
 
     def all_parse_response(self):
 
         result = dict()
         for court in self.url_court:
-            result[court] = self.single_parse(court)
-
+            page = self.get_page_single_parse(court)
+            result[court] = self.parce_single_page(page)
         return result
 
 
 if __name__ == '__main__':
     instance = sudrf_parser()
-    instance.single_parse()
+    instance.get_page_single_parse()
