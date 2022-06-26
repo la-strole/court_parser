@@ -1,27 +1,44 @@
 import unittest
-from selenium import webdriver
 from time import sleep
+
+from selenium import webdriver
 
 
 class TestGetPage(unittest.TestCase):
     def test_get_page(self):
-        url = "http://pechorsky.psk.sudrf.ru"
-        title = "Печорский районный суд Псковской области"
+        # https://free-proxy-list.net/
+
+        proxy = '45.149.43.56:53281'
+        proxy_settings = {
+            "proxyType": "MANUAL",
+            "httpProxy": proxy,
+            "sslProxy": proxy,
+        }
+
+        url = "http://porhovsky.psk.sudrf.ru"
+        title = "Порховский районный суд Псковской области"
 
         # Set selenium configuration (run at docker container)
         options = webdriver.FirefoxOptions()
+
+        options.set_capability('proxy', proxy_settings)
+
         selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
-        browser = webdriver.Remote(command_executor=selenium_grid_url,
-                                   options=options)
-        # Get page
-        browser.get(url)
-        test_title = browser.title
 
-        # Stop browser
-        sleep(5)
-        browser.quit()
+        with webdriver.Remote(command_executor=selenium_grid_url,
+                              options=options) as browser:
+            browser.set_page_load_timeout(300)
 
-        self.assertEqual(test_title, title, f"Title {title} not in page title. Actual is {test_title}")
+            # browser.get('https://www.find-ip.net/')
+
+            # Get page
+            browser.get(url)
+            test_title = browser.title
+
+            # Stop browser
+            sleep(5)
+
+        self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
 
 
 if __name__ == "__main__":
