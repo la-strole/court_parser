@@ -64,6 +64,23 @@ class TestGetPage(unittest.TestCase):
 
         self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
 
+    def test_docker_selenium(self):
+        selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
+
+        # https://selenium-python.readthedocs.io/api.html
+        driver = webdriver.Remote(options=webdriver.FirefoxOptions(),
+                                  command_executor=selenium_grid_url)
+
+        driver.maximize_window()
+        driver.minimize_window()
+        driver.get("https://www.google.com/")
+        title = driver.title
+
+        # close the browser
+        driver.close()
+
+        self.assertEqual(title, "Google", f"Expected title is Google, get - '{title}'.")
+
 
 if __name__ == "__main__":
     unittest.main()
