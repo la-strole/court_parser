@@ -8,11 +8,14 @@ class TestGetPage(unittest.TestCase):
     def test_get_page_proxy(self):
         # https://free-proxy-list.net/
 
-        proxy = '45.149.43.56:53281'
+        proxy = '185.141.233.209:22475'
+
         proxy_settings = {
             "proxyType": "MANUAL",
-            "httpProxy": proxy,
-            "sslProxy": proxy,
+            # "httpProxy": proxy,
+            # "sslProxy": proxy,
+            'socksProxy': proxy,
+            'socksVersion': 5,
         }
 
         url = "http://porhovsky.psk.sudrf.ru"
@@ -25,19 +28,19 @@ class TestGetPage(unittest.TestCase):
 
         selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
 
-        with webdriver.Remote(command_executor=selenium_grid_url,
-                              options=options) as browser:
-            browser.set_page_load_timeout(300)
+        browser = webdriver.Remote(command_executor=selenium_grid_url,
+                                   options=options)
+        browser.set_page_load_timeout(300)
 
-            # browser.get('https://www.find-ip.net/')
+        # browser.get('https://www.find-ip.net/')
 
-            # Get page
-            browser.get(url)
-            test_title = browser.title
+        # Get page
+        browser.get(url)
+        test_title = browser.title
 
-            # Stop browser
-            sleep(5)
-            browser.close()
+        # Stop browser
+        sleep(5)
+        browser.quit()
 
         self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
 
@@ -50,17 +53,17 @@ class TestGetPage(unittest.TestCase):
 
         selenium_grid_url = "http://0.0.0.0:4444/wd/hub"
 
-        with webdriver.Remote(command_executor=selenium_grid_url,
-                              options=options) as browser:
-            browser.set_page_load_timeout(300)
+        browser =  webdriver.Remote(command_executor=selenium_grid_url,
+                                    options=options)
+        browser.set_page_load_timeout(300)
 
-            # Get page
-            browser.get(url)
-            test_title = browser.title
+        # Get page
+        browser.get(url)
+        test_title = browser.title
 
-            # Stop browser
-            sleep(5)
-            browser.close()
+        # Stop browser
+        sleep(5)
+        browser.quit()
 
         self.assertEqual(test_title, title, f"Title '{title}' not in page title. Actual is '{test_title}'.")
 
@@ -77,7 +80,7 @@ class TestGetPage(unittest.TestCase):
         title = driver.title
 
         # close the browser
-        driver.close()
+        driver.quit()
 
         self.assertEqual(title, "Google", f"Expected title is Google, get - '{title}'.")
 
